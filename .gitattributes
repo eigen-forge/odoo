@@ -1,0 +1,8 @@
+# Avoid CRLF shebang failures when building Linux containers from Windows.
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.conf text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+compose.yaml text eol=lf
+*.ps1 text eol=crlf
