@@ -32,9 +32,7 @@ Laisser les conteneurs démarrés et accéder à **http://localhost:8069** dans 
 
 À l'écran de création de base Odoo :
 
-1. Récupérer le **Master Password** sur l'hôte Docker avec : ~~~bash
-   cat secrets/odoo_master_password
-   ~~~
+1. Récupérer le **Master Password** sur l'hôte Docker avec la commande `cat secrets/odoo_master_password`.
 2. Choisir une base, par exemple : **odoo_demo**.
 3. Définir un email et un mot de passe administrateur Odoo propres à cette base (différents du Master Password).
 4. Choisir la langue, éventuellement les données de démonstration, puis créer la base.
