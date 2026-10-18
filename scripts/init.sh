@@ -12,6 +12,10 @@ fi
 mkdir -p secrets
 for name in postgresql_password odoo_master_password; do
   file="secrets/$name"
+  if [[ -d "$file" ]]; then
+    printf '%s is a directory, not a secret file. Check before removing it.\n' "$file" >&2
+    exit 1
+  fi
   if [[ ! -e "$file" ]]; then
     openssl rand -hex 32 > "$file"
     printf 'Created: %s\n' "$file"
@@ -22,6 +26,10 @@ for name in postgresql_password odoo_master_password; do
   chmod 600 "$file"
 done
 
+if [[ -d .env ]]; then
+  printf '.env is a directory, not a file.\n' >&2
+  exit 1
+fi
 if [[ ! -e .env ]]; then
   cp .env.example .env
   printf 'Created: .env\n'
