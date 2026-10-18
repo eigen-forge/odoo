@@ -1,0 +1,61 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgresql_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    secrets:
+      - postgresql_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - internal
+
+  odoo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: eigen-forge-odoo-community:19.0-local
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      HOST: db
+      PORT: "5432"
+      USER: odoo
+      PASSWORD_FILE: /run/secrets/postgresql_password
+    ports:
+      - "${ODOO_BIND_IP:-127.0.0.1}:${ODOO_PORT:-8069}:8069"
+    secrets:
+      - postgresql_password
+      - odoo_master_password
+    volumes:
+      - odoo_data:/var/lib/odoo
+      - ./addons:/mnt/extra-addons:ro
+      - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
+    networks:
+      - internal
+
+secrets:
+  postgresql_password:
+    file: ./secrets/postgresql_password
+  odoo_master_password:
+    file: ./secrets/odoo_master_password
+
+volumes:
+  postgres_data:
+  odoo_data:
+
+networks:
+  internal:
+    driver: bridge
