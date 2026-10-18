@@ -12,7 +12,39 @@ Infrastructure d'exploration pour Odoo Community 19.0 et PostgreSQL 16. Le code 
 
 ## Prérequis
 
-Docker Engine / Docker Desktop avec Docker Compose v2, Bash et OpenSSL. Sur Windows, utiliser WSL2. Prévoir environ 8 Go de RAM disponibles pour les essais.
+Docker Engine / Docker Desktop avec Docker Compose v2. Sur Windows, Docker Desktop (moteur Linux/WSL2) et PowerShell suffisent. Sur Linux/macOS, prévoir Bash et OpenSSL pour l'initialisation. Prévoir environ 8 Go de RAM disponibles pour les essais.
+
+## Installation depuis Windows PowerShell
+
+Depuis le dossier du projet (`C:\\dev\\odoo` si tu l'as déjà cloné) :
+
+~~~powershell
+cd C:\dev\odoo
+git pull --ff-only
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\init.ps1
+docker compose config --quiet
+docker compose up -d --build --force-recreate
+docker compose ps
+~~~
+
+Le script `scripts/init.ps1` utilise le générateur cryptographique de Windows, crée `secrets/postgresql_password` et `secrets/odoo_master_password`, puis crée `.env` si nécessaire. Les secrets existants ne sont pas écrasés. **Ne lance pas `scripts/init.sh` directement dans PowerShell** : ce script est pour Bash.
+
+Ouvrir ensuite **http://localhost:8069**. Pour consulter le mot de passe principal dans PowerShell :
+
+~~~powershell
+Get-Content .\secrets\odoo_master_password
+~~~
+
+### Si PostgreSQL est marqué `unhealthy`
+
+Vérifier la présence de fichiers (et non de répertoires) dans `secrets/` :
+
+~~~powershell
+Get-ChildItem .\secrets -Force
+docker compose logs --tail=100 db
+~~~
+
+Si un secret n'existe pas, relancer `init.ps1` puis `docker compose up -d --build --force-recreate`. Si un chemin de secret est un **répertoire**, examiner son contenu avant toute suppression, puis relancer l'initialisation. Ne pas utiliser `docker compose down -v` pour ce problème.
 
 ## Installation en local ou sur un serveur Linux
 
