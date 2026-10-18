@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Applies only to the database in which this add-on is installed/updated.
+      XML <function> is executed on BOTH installation (-i) and upgrade (-u).
+      The main company exists in every normally initialized Odoo database.
+      Do not use noupdate="1": Git must remain the source of truth.
+    -->
+    <function
+        model="res.company"
+        name="write"
+        eval="[[ref('base.main_company')], {
+            'quotation_validity_days': 21,
+            'portal_confirmation_sign': True,
+            'portal_confirmation_pay': False,
+        }]"
+    />
+</odoo>

@@ -110,6 +110,24 @@ docker compose exec -T odoo tar -C /var/lib/odoo -cf - filestore > backups/odoo_
 
 Pour une sauvegarde cohérente, interrompre temporairement les écritures ou utiliser le mécanisme de sauvegarde Odoo. Les sauvegardes automatisées, la restauration, HTTPS, le monitoring et le reverse proxy devront être ajoutés avant une mise en production.
 
+## Configuration Ventes « as code » (exemple)
+
+Le dépôt contient un module Odoo Community installable : **addons/eigen_sales_config/**. Il installe l'application officielle Ventes (dépendance **sale_management**) et applique des paramètres versionnés **uniquement dans la base de données sélectionnée** :
+
+- Devis valables 21 jours
+- Signature en ligne activée
+- Paiement en ligne à la confirmation désactivé
+
+Sur Windows PowerShell, après avoir créé la base **odoo_demo**, appliquer la configuration avec :
+
+~~~powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\apply-sales-config.ps1 -Database odoo_demo -Action install
+~~~
+
+Pour réappliquer la configuration après modification du XML, remplacer **install** par **upgrade**.
+
+Lire **[docs/sales-as-code.md](docs/sales-as-code.md)** pour les explications, les commandes Linux et les vérifications. Le script arrête temporairement le service web Odoo pour toutes les bases partagées par cette stack.
+
 ## Personnalisation et évolutions
 
 Placer les nouveaux modules Odoo dans **addons/** (un sous-répertoire par module). Leur code est monté en lecture seule dans le conteneur ; redémarrer Odoo lorsque nécessaire et installer/actualiser les modules via l'interface ou la CLI.
